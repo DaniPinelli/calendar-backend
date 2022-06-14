@@ -1,7 +1,5 @@
 const { response } = require('express');
 
-
-
 const createUser = (req, res = response) => {
 
     const { name, email, password } = req.body;
