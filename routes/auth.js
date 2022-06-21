@@ -1,4 +1,5 @@
 /*
+import validateJWT from './../middlewares/validar-jwt';
   User Authentication
   host + api/auth
  */
@@ -8,7 +9,8 @@ const { check } = require('express-validator');
 const router = express.Router();
 const { validateFields } = require('../middlewares/validar-campos');
 
-const { createUser, login, renew } = require('../controllers/auth');
+const { createUser, login, renewToken } = require('../controllers/auth');
+const { validateJWT } = require('../middlewares/validar-jwt')
 
 
 // Routes
@@ -31,6 +33,8 @@ router.post('/',
     login);
 
 // Token
-router.get('/renew', renew);
+router.get('/renew', validateJWT, renewToken);
+
+
 
 module.exports = router

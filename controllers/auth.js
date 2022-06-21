@@ -1,6 +1,7 @@
 const { response } = require('express');
 const bcryptjs = require('bcryptjs');
 const User = require('../models/User');
+const { generateJWT } = require('../helpers/jwt');
 
 const createUser = async (req, res = response) => {
 
@@ -25,11 +26,15 @@ const createUser = async (req, res = response) => {
 
         await user.save();
 
+        // Generate token
+        const token = await generateJWT(user.id, user.name);
+
         res.status(201).json({
             ok: true,
             uid: user.id,
-            msg: 'User created successfully'
-
+            name: user.name,
+            msg: 'User created successfully',
+            token
         })
 
     } catch (error) {
@@ -68,14 +73,14 @@ const login = async (req, res = response) => {
         }
 
         // Generate token
-        //     const token = await user.generateToken();
+        const token = await generateJWT(user.id, user.name);
 
         res.json({
             ok: true,
             uid: user.id,
             name: user.name,
             email: user.email,
-            //       token
+            token
         })
 
     } catch (error) {
@@ -85,23 +90,24 @@ const login = async (req, res = response) => {
             msg: 'Error, please contact the administrator'
         })
     }
-
-    res.status(201).json({
-        ok: true,
-        msg: 'Login Successful',
-        email,
-        password
-    })
 }
 
-const renew = (req, res = response) => {
+const renewToken = async (req, res = response) => {
+
+    const { uid, name } = req;
+
+    // Generate token
+    const token = await generateJWT(uid, name)
+
     res.json({
         ok: true,
-        msg: 'Renew Token Successful'
+        token
     })
 }
 
 
 module.exports = {
-    createUser, login, renew
+    createUser,
+    login,
+    renewToken
 }
